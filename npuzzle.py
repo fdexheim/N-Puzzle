@@ -3,7 +3,7 @@ import os
 import array
 from tools import tile_yx
 import math
-
+from env import g_env
 
 def get_initial_state_from_file(path):
     firstline = 0
@@ -55,14 +55,13 @@ def get_initial_state_from_file(path):
         print("Bad puzzle format, missing lines")
         return None, 0
     return ret, puzzle_size
-'''
+
+
 def get_desired_board(size):
-    size = 4
     ret = [-1] * size
     for i in range(0, size):
         ret[i] = [-1] * size
-    print(ret)
-    start_x = 0
+    start_x = -1
     start_y = 0;
     end_x = size - 1
     end_y = size - 1
@@ -73,42 +72,33 @@ def get_desired_board(size):
 
     ran = int(math.pow(size, 2))
     for i in range(1, ran + 1):
-        print("ret[{0}][{1}] = {2}    Xranges{3}-{4} Yranges{5}-{6}".format(y, x, i, start_x, end_x, start_y, end_y))
-
         if (i == ran):
             ret[y][x] = 0
-            for j in range(0, size):
-                print(ret[j])
-            return
+            return ret
         else:
             ret[y][x] = i
 
         if (x == end_x and y == start_y):
-            print("First Corner")
             xmove = 0
             ymove = 1
+            start_x += 1
         elif (x == end_x and y == end_y):
-            print("Second Corner")
             xmove = -1
             ymove = 0
             start_y += 1
         elif (x == start_x and y == end_y):
-            print("Third Corner")
             xmove = 0
             ymove = -1
             end_x -= 1
-        elif (x == start_x and y - 1 == start_y):
-            print("Fourth Corner")
+        elif (x == start_x and y == start_y):
             xmove = 1
             ymove = 0
             end_y -= 1
-            start_x += 1
         y += ymove;
         x += xmove;
-    print("Wrong return")
-    print(ret)
-    return 0
-'''
+    print("Unexpected return encountered in get_desired_board()")
+    return ret
+
 
 def check_initial_state(initial_state, size):
     ran = int(math.pow(size, 2))
@@ -130,14 +120,17 @@ def main(argc, argv):
         print("Puzzle tile verification failed")
         exit()
 
-    print("puzzle_size ('" + str(type(puzzle_size)) + "') = " + str(puzzle_size))
-    print(str(type(initial_state)))
-    print(initial_state)
+    print("initial_board " + str(puzzle_size))
+    for j in range(0, puzzle_size):
+        print(initial_state[j])
 
     if (check_initial_state == False):
         print("Bad initial_state")
         exit()
-    desired_state = get_desired_state(puzzle_size);
-
+    desired_board = get_desired_board(puzzle_size);
+    print("desired_board : ")
+    for j in range(0, puzzle_size):
+        print(desired_board[j])
+    print(str(g_env.puzzle_width))
 
 main(len(sys.argv), sys.argv)
