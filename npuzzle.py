@@ -1,9 +1,10 @@
 import sys
 import os
 import array
-from tools import tile_yx
 import math
+from tools import tile_yx
 from env import g_env
+from Solver import Solver
 
 def get_initial_state_from_file(path):
     firstline = 0
@@ -103,15 +104,17 @@ def get_desired_board(size):
 def check_initial_state(initial_state, size):
     ran = int(math.pow(size, 2))
     for i in range(0, ran):
-        if (tile_yx(i, initial_state, size) == None):
+        if (tile_yx(initial_state, i) == None):
             return False
     return True
+
 
 def main(argc, argv):
     if (argc < 2):
         print("Bad arg")
         return
-
+    g_env.argc = argc
+    g_env.argv = argv
     initial_state, puzzle_size = get_initial_state_from_file(argv[1])
     if (initial_state == None):
         print("Parsing Error")
@@ -124,13 +127,17 @@ def main(argc, argv):
     for j in range(0, puzzle_size):
         print(initial_state[j])
 
-    if (check_initial_state == False):
+    if (check_initial_state(initial_state, puzzle_size) == False):
         print("Bad initial_state")
         exit()
-    desired_board = get_desired_board(puzzle_size);
+    g_env.puzzle_width = puzzle_size
+    g_env.desired_board = get_desired_board(puzzle_size);
     print("desired_board : ")
     for j in range(0, puzzle_size):
-        print(desired_board[j])
-    print(str(g_env.puzzle_width))
+        print(g_env.desired_board[j])
+    print("puzzle_width : " + str(g_env.puzzle_width))
+
+    solver = Solver()
+    solver.solve(initial_state)
 
 main(len(sys.argv), sys.argv)
