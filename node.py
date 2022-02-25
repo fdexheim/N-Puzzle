@@ -1,5 +1,6 @@
 from tools import tile_value_yx
 from tools import tile_yx
+from env import g_env
 
 class Node:
     def __init__(self, puzzle, parent=None, move=None):
@@ -25,8 +26,9 @@ class Node:
 
 
     def is_solved(self):
-        if self.equals(g_env.board):
+        if (str(self.puzzle) == str(g_env.desired_board)):
             return True
+        return False
 
 
 
