@@ -8,6 +8,8 @@ class Node:
         self.parent = parent
         self.move = move
         self.g = 0
+        self.uid = g_env.uid
+        g_env.uid += 1
         if (self.parent != None):
             self.g = parent.g + 1
         if (move != None):

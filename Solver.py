@@ -63,16 +63,19 @@ class Solver:
         existing_opened_nodes = 0
         for move in moves:
             new_node = Node(copy.deepcopy(parent.puzzle), parent, move)
+            node_already_exists = False
             for closed_node in self.closed_nodes:
                 if (new_node.equals(closed_node) == True):
                     existing_closed_nodes += 1
-                    continue
+                    node_already_exists = True
+                    break
             for opened_node in self.opened_nodes:
                 if (new_node.equals(opened_node) == True):
                     existing_opened_nodes += 1
-                    continue
-            nodes.append(new_node)
-        #print(str(existing_nodes) + " Existing node found in closed_nodes")
+                    node_already_exists = True
+                    break
+            if node_already_exists == False:
+                nodes.append(new_node)
         if (g_env.heuristics == False):
             curated_nodes = nodes;
         else:
@@ -80,39 +83,109 @@ class Solver:
         return curated_nodes
 
 
+    def get_inversion_count(self, puz):
+        inversions = 0
+        for i in range(0, len(puz)):
+            for j in range(i + 1, len(puz)):
+                if (puz[i] != 0 and puz[j] != 0 and puz[i] > puz[j]):
+                    inversions += 1
+        return inversions
+
+
+    def check_solvability(self, initial_puzzle):
+        one_d_board = []
+        one_d_ref = []
+        for i in range(0, g_env.puzzle_width):
+            for j in range(0, g_env.puzzle_width):
+                one_d_board.append(initial_puzzle[i][j])
+                one_d_ref.append(g_env.desired_board[i][j])
+        print(one_d_board)
+        print(one_d_ref)
+        inversion_board = self.get_inversion_count(one_d_board)
+        inversion_ref = self.get_inversion_count(one_d_ref)
+        print(inversion_board)
+        print(inversion_ref)
+        if (g_env.puzzle_width % 2 == 0):
+            inversion_board += one_d_board.index(0)
+            inversion_ref += one_d_ref.index(0)
+        print(inversion_board)
+        print(inversion_ref)
+        if (inversion_board % 2 == inversion_ref % 2):
+            return True
+        return False
+
+
+    def print_solution(self, node):
+        nodes = []
+        moves = ""
+        ptr = node
+        while (ptr.parent != None):
+            nodes.append(ptr)
+            moves += ptr.move.move
+            ptr = ptr.parent
+        print(len(nodes))
+        for snode in nodes[::-1]:
+            snode.print_puzzle()
+            print("")
+        print(moves[::-1])
+        print("max_states    : " + str(g_env.max_states))
+        print("opened_states : " + str(g_env.opened_states))
+
 
     def solve(self, initial_puzzle):
+        solvable = self.check_solvability(initial_puzzle)
+        if (solvable == False):
+            print("Input puzzle has no solution")
+            exit()
         time_start = time.clock()
-
         firstNode = Node(copy.deepcopy(initial_puzzle), None, None)
         self.opened_nodes.append(firstNode)
         i = 0;
         while (len(self.opened_nodes) > 0):
             i += 1
             print("============= ITER " + str(i) + " ==============")
+            tot_states = len(self.opened_nodes) + len(self.closed_nodes)
+            if tot_states > g_env.max_states:
+                g_env.max_states = tot_states
             print(str(len(self.opened_nodes)) + " opened_nodes")
             for node in self.opened_nodes:
-                node.print_puzzle()
-                print("")
+                print(node.uid, end=" ")
+            print("")
+            #for node in self.opened_nodes:
+            #    node.print_puzzle()
+            #    print("")
             print(str(len(self.closed_nodes)) + " closed_nodes")
             for node in self.closed_nodes:
-                node.print_puzzle()
-                print("")
+                print(node.uid, end=" ")
+            print("")
+            #for node in self.closed_nodes:
+            #    node.print_puzzle()
+            #    print("")
             add_nodes = []
+            iter_add_nodes = []
+            process_nodes = []
             for op in self.opened_nodes:
+                process_nodes.append(op)
+            for op in process_nodes:
+                print("processsing node " + str(op.uid))
                 if (op.is_solved() == True):
                     print("SOLVED")
                     time_end = time.clock()
+                    self.print_solution(op)
                     print("time to solve : " + str(time_end - time_start))
                     exit()
                 self.opened_nodes.remove(op)
                 self.closed_nodes.append(op)
                 moves = self.get_possible_moves(op)
                 add_nodes = self.try_curate_moves(op, moves)
-                print(str(len(add_nodes)) + " add_nodes")
-            for add_node in add_nodes:
-                self.opened_nodes.append(add_node)
-                print("");
+                for add_node in add_nodes:
+                    self.opened_nodes.append(add_node)
+                    iter_add_nodes.append(add_node)
+            print(str(len(iter_add_nodes)) + " iter_add_nodes ", end=" : ")
+            for node in iter_add_nodes:
+                print(node.uid, end=" ")
+            print("");
             if (i >= 5):
+                print("")
                 break
             #print("\n")
