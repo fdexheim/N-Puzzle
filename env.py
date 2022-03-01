@@ -7,5 +7,5 @@ class g_env:
     time_start = 0
     time_end = 0
     max_opened_states = 0
-    heuristics = False
+    heuristics = { "manhattan_distance", "misplaced_tiles" }
     heuristic = ""

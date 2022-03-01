@@ -121,17 +121,13 @@ class Solver:
     def astar(self, initial_puzzle):
         self.opened_nodes.append(Node(copy.deepcopy(initial_puzzle), None, None))
         while (len(self.opened_nodes) > 0):
-#            print(str(len(self.opened_nodes)) + " opened_nodes")
-#            print(str(len(self.closed_nodes)) + " closed_nodes")
             op_size = len(self.opened_nodes)
             cl_size = len(self.closed_nodes)
             if (op_size > g_env.max_opened_states):
                 g_env.max_opened_states = op_size
-#            for nodei in self.opened_nodes:
-#                print("node      {0} (f = {1}   g = {2}   h = {3})".format(nodei.uid, nodei.f, nodei.g, nodei.h))
             self.opened_nodes.sort(key=lambda x: x.f)
-#            for nodei in self.opened_nodes:
-#                print("sort node {0} (f = {1}   g = {2}   h = {3})".format(nodei.uid, nodei.f, nodei.g, nodei.h))
+            for nodei in self.opened_nodes:
+                print("sort node {0} (f = {1}   g = {2}   h = {3})".format(nodei.uid, nodei.f, nodei.g, nodei.h))
             node = self.opened_nodes.pop(0)
             self.closed_nodes.append(node)
             if node.is_solved() == True:
@@ -140,6 +136,8 @@ class Solver:
             add_nodes = self.create_child_nodes(node, moves)
             for add_node in add_nodes:
                 self.opened_nodes.append(add_node)
+            print("")
+            #a = input()
         return None
 
 
@@ -149,6 +147,9 @@ class Solver:
         if (solvable == False):
             print("Input puzzle has no solution")
             exit()
+
+        if (g_env.puzzle_width > 5):
+            print("You're getting hungry, expect it to take some time (even with heuristics)")
 
         time_start = time.clock()
 

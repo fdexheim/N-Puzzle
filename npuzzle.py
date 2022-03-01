@@ -119,6 +119,14 @@ def main(argc, argv):
     initial_state, puzzle_size = get_initial_state_from_file(argv[1])
     if argc >= 3:
         g_env.heuristic = argv[2].lower()
+    if argc < 3 or g_env.heuristic in g_env.heuristics == False:
+        print("Warning : missing heuristic or wrong heuristic name")
+        print("Aviable heuristics : " + str(g_env.heuristics))
+        print("Continue ?")
+        a = input()
+        if (a.lower() == "no" or a.lower() == "n"):
+            return
+
     if (initial_state == None):
         print("Parsing Error")
         exit()
