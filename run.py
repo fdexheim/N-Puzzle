@@ -120,12 +120,13 @@ def main(argc, argv):
     if argc >= 3:
         g_env.heuristic = argv[2].lower()
     if argc < 3 or g_env.heuristic in g_env.heuristics == False:
-        print("Warning : missing heuristic or wrong heuristic name")
+        print("[WARNING] missing heuristic or wrong heuristic name")
         print("Aviable heuristics : " + str(g_env.heuristics))
-        print("Continue ?")
+        print("Continue ? yes / no (input heuristic name if intend to proceed with one instead)")
         a = input()
         if (a.lower() == "no" or a.lower() == "n"):
             return
+        g_env.heuristic = a.lower()
 
     if (initial_state == None):
         print("Parsing Error")
@@ -150,5 +151,3 @@ def main(argc, argv):
 
     solver = Solver()
     solver.solve(initial_state)
-
-

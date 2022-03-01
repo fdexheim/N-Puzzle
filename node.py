@@ -35,6 +35,8 @@ class Node:
         return False
 
 
+    def print_data(self, name):
+        print("node {0}   uid = {1}   f = {2}   g = {3}   h = {4}".format(name, self.uid, self.f, self.g, self.h))
 
     def print_puzzle(self):
         for i in range(0, len(self.puzzle)):
@@ -44,7 +46,3 @@ class Node:
                 else:
                     print(str(self.puzzle[i][j]), end = " ")
             print("");
-
-    def record_fgh(self):
-        self.h = 0
-        self.f = self.g + self.h

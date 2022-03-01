@@ -16,6 +16,8 @@ class Solver:
     def __init__(self):
         self.opened_nodes = []
         self.closed_nodes = [] #list of states already gone through
+        time_start = 0
+        time_end = 0
         return
 
     def check_closed_nodes(self, node_cmp):
@@ -56,6 +58,13 @@ class Solver:
         return ret
 
 
+    def replace_node(self, nodes, node_to_replace, new_node):
+
+        for i, n in enumerate(nodes):
+            if n == node_to_replace:
+                nodes[i] = new_node
+        return
+
 
     def create_child_nodes(self, parent, moves):
         nodes = []
@@ -65,10 +74,14 @@ class Solver:
             for closed_node in self.closed_nodes:
                 if (new_node.equals(closed_node) == True):
                     node_already_exists = True
+                    if (new_node.f < closed_node.f):
+                        self.replace_node(self.closed_nodes, closed_node, new_node)
                     break
             for opened_node in self.opened_nodes:
                 if (new_node.equals(opened_node) == True):
                     node_already_exists = True
+                    if (new_node.f < opened_node.f):
+                        self.replace_node(self.opened_nodes, opened_node, new_node)
                     break
             if node_already_exists == False:
                 nodes.append(new_node)
@@ -77,6 +90,7 @@ class Solver:
 
 
     def print_solution(self, node):
+        self.time_end = time.clock()
         nodes = []
         moves = ""
         ptr = node
@@ -87,11 +101,12 @@ class Solver:
         for snode in nodes[::-1]:
             snode.print_puzzle()
             print("")
-        print(moves[::-1])
         print("Moves required    : " + str(len(nodes)))
+        print("Moves (tile 0)    : " + moves[::-1])
         print("max_opened_states : " + str(g_env.max_opened_states))
-        print("total states      : " + str(g_env.uid))
-
+        print("Total states      : " + str(g_env.uid))
+        print("Time to solve     : " + str(self.time_end - self.time_start))
+        exit()
 
 
     def astar(self, initial_puzzle):
@@ -103,7 +118,7 @@ class Solver:
                 g_env.max_opened_states = op_size
             self.opened_nodes.sort(key=lambda x: x.f)
             node = self.opened_nodes.pop(0)
-            print("first node {0} (f = {1}   g = {2}   h = {3})".format(node.uid, node.f, node.g, node.h))
+            #node.print_data("first")
             self.closed_nodes.append(node)
             if node.is_solved() == True:
                 return node
@@ -111,7 +126,6 @@ class Solver:
             add_nodes = self.create_child_nodes(node, moves)
             for add_node in add_nodes:
                 self.opened_nodes.append(add_node)
-            print("")
             #a = input()
         return None
 
@@ -126,14 +140,10 @@ class Solver:
         if (g_env.puzzle_width > 5):
             print("You're getting hungry, expect it to take some time (even with heuristics)")
 
-        time_start = time.clock()
-
+        self.time_start = time.clock()
         op = self.astar(initial_puzzle)
-
-        time_end = time.clock()
 
         if (op != None):
             self.print_solution(op)
         else:
             print("Bad : search returned none (somehow)")
-        print("time to solve     : " + str(time_end - time_start))
