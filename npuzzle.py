@@ -111,11 +111,14 @@ def check_initial_state(initial_state, size):
 
 def main(argc, argv):
     if (argc < 2):
-        print("Bad arg")
+        print("usage : python3 npuzzle.py [puzzle file] [heuristic]")
+        print("heuristics : mahattan_distance | misplaced_tiles | linear_conflict")
         return
     g_env.argc = argc
     g_env.argv = argv
     initial_state, puzzle_size = get_initial_state_from_file(argv[1])
+    if argc >= 3:
+        g_env.heuristic = argv[2].lower()
     if (initial_state == None):
         print("Parsing Error")
         exit()

@@ -58,29 +58,20 @@ class Solver:
 
     def create_child_nodes(self, parent, moves):
         nodes = []
-        curated_nodes = []
-        existing_closed_nodes = 0
-        existing_opened_nodes = 0
         for move in moves:
             new_node = Node(copy.deepcopy(parent.puzzle), parent, move)
             node_already_exists = False
             for closed_node in self.closed_nodes:
                 if (new_node.equals(closed_node) == True):
-                    existing_closed_nodes += 1
                     node_already_exists = True
                     break
             for opened_node in self.opened_nodes:
                 if (new_node.equals(opened_node) == True):
-                    existing_opened_nodes += 1
                     node_already_exists = True
                     break
             if node_already_exists == False:
                 nodes.append(new_node)
-        if (g_env.heuristics == False):
-            curated_nodes = nodes;
-        else:
-            curated_moves = 0 #this is where heuristics should kick in
-        return curated_nodes
+        return nodes
 
 
     def get_inversion_count(self, puz):
@@ -117,29 +108,31 @@ class Solver:
             nodes.append(ptr)
             moves += ptr.move.move
             ptr = ptr.parent
-        print(len(nodes))
         for snode in nodes[::-1]:
             snode.print_puzzle()
             print("")
         print(moves[::-1])
-        print("max_states    : " + str(g_env.max_states))
-        print("opened_states : " + str(g_env.opened_states))
+        print("Moves required    : " + str(len(nodes)))
+        print("max_opened_states : " + str(g_env.max_opened_states))
+        print("total states      : " + str(g_env.uid))
+
 
 
     def astar(self, initial_puzzle):
         self.opened_nodes.append(Node(copy.deepcopy(initial_puzzle), None, None))
-        i = 0
         while (len(self.opened_nodes) > 0):
 #            print(str(len(self.opened_nodes)) + " opened_nodes")
 #            print(str(len(self.closed_nodes)) + " closed_nodes")
-            tot_states = len(self.opened_nodes) + len(self.closed_nodes)
-            if tot_states > g_env.max_states:
-                g_env.max_states = tot_states
-
-            # this part will change
+            op_size = len(self.opened_nodes)
+            cl_size = len(self.closed_nodes)
+            if (op_size > g_env.max_opened_states):
+                g_env.max_opened_states = op_size
+#            for nodei in self.opened_nodes:
+#                print("node      {0} (f = {1}   g = {2}   h = {3})".format(nodei.uid, nodei.f, nodei.g, nodei.h))
+            self.opened_nodes.sort(key=lambda x: x.f)
+#            for nodei in self.opened_nodes:
+#                print("sort node {0} (f = {1}   g = {2}   h = {3})".format(nodei.uid, nodei.f, nodei.g, nodei.h))
             node = self.opened_nodes.pop(0)
-            #
-
             self.closed_nodes.append(node)
             if node.is_solved() == True:
                 return node
@@ -147,10 +140,6 @@ class Solver:
             add_nodes = self.create_child_nodes(node, moves)
             for add_node in add_nodes:
                 self.opened_nodes.append(add_node)
-#            print("");
-            if (i >= 20):
-                print("max iteration reached")
-                break
         return None
 
 
@@ -164,10 +153,11 @@ class Solver:
         time_start = time.clock()
 
         op = self.astar(initial_puzzle)
-        print("SOLVED")
 
         time_end = time.clock()
 
         if (op != None):
             self.print_solution(op)
-        print("time to solve : " + str(time_end - time_start))
+        else:
+            print("Bad : search returned none (somehow)")
+        print("time to solve     : " + str(time_end - time_start))
