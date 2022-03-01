@@ -4,6 +4,7 @@ import math
 from tools import tile_yx
 from node import Node
 from env import g_env
+from solvability import check_solvability
 
 class Direction:
     def __init__(self, move, y, x):
@@ -74,31 +75,6 @@ class Solver:
         return nodes
 
 
-    def get_inversion_count(self, puz):
-        inversions = 0
-        for i in range(0, len(puz)):
-            for j in range(i + 1, len(puz)):
-                if (puz[i] != 0 and puz[j] != 0 and puz[i] > puz[j]):
-                    inversions += 1
-        return inversions
-
-
-    def check_solvability(self, initial_puzzle):
-        one_d_board = []
-        one_d_ref = []
-        for i in range(0, g_env.puzzle_width):
-            for j in range(0, g_env.puzzle_width):
-                one_d_board.append(initial_puzzle[i][j])
-                one_d_ref.append(g_env.desired_board[i][j])
-        inversion_board = self.get_inversion_count(one_d_board)
-        inversion_ref = self.get_inversion_count(one_d_ref)
-        if (g_env.puzzle_width % 2 == 0):
-            inversion_board += one_d_board.index(0)
-            inversion_ref += one_d_ref.index(0)
-        if (inversion_board % 2 == inversion_ref % 2):
-            return True
-        return False
-
 
     def print_solution(self, node):
         nodes = []
@@ -126,9 +102,8 @@ class Solver:
             if (op_size > g_env.max_opened_states):
                 g_env.max_opened_states = op_size
             self.opened_nodes.sort(key=lambda x: x.f)
-            for nodei in self.opened_nodes:
-                print("sort node {0} (f = {1}   g = {2}   h = {3})".format(nodei.uid, nodei.f, nodei.g, nodei.h))
             node = self.opened_nodes.pop(0)
+            print("first node {0} (f = {1}   g = {2}   h = {3})".format(node.uid, node.f, node.g, node.h))
             self.closed_nodes.append(node)
             if node.is_solved() == True:
                 return node
@@ -143,7 +118,7 @@ class Solver:
 
 
     def solve(self, initial_puzzle):
-        solvable = self.check_solvability(initial_puzzle)
+        solvable = check_solvability(initial_puzzle, g_env.desired_board, g_env.puzzle_width)
         if (solvable == False):
             print("Input puzzle has no solution")
             exit()
