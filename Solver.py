@@ -1,16 +1,11 @@
 import time
 import copy
 import math
-from tools import tile_yx
+from tools import tile_yx, get_possible_moves, Direction
 from node import Node
 from env import g_env
 from solvability import check_solvability
 
-class Direction:
-    def __init__(self, move, y, x):
-        self.move = move
-        self.y = y
-        self.x = x
 
 class Solver:
     def __init__(self):
@@ -34,28 +29,6 @@ class Solver:
     def add_node():
         return
 
-
-
-    def get_possible_moves(self, node):
-        moves = { Direction('u', -1, 0), Direction('d', 1, 0), Direction('l', 0, -1), Direction('r', 0, 1) }
-        y, x = tile_yx(node.puzzle, 0)
-        ret = []
-        for move in moves:
-            cmpy = y + move.y
-            cmpx = x + move.x
-            # exclude cases where previous move was the opposite
-            if (node.move != None):
-                if node.move.move == 'd' and move.move == 'u':
-                    continue
-                if node.move.move == 'u' and move.move == 'd':
-                    continue
-                if node.move.move == 'l' and move.move == 'r':
-                    continue
-                if node.move.move == 'r' and move.move == 'l':
-                    continue
-            if (cmpx >= 0 and cmpx < g_env.puzzle_width and cmpy >= 0 and cmpy < g_env.puzzle_width):
-                ret.append(move)
-        return ret
 
 
     def replace_node(self, nodes, node_to_replace, new_node):
@@ -122,7 +95,7 @@ class Solver:
             self.closed_nodes.append(node)
             if node.is_solved() == True:
                 return node
-            moves = self.get_possible_moves(node)
+            moves = get_possible_moves(node.puzzle, g_env.puzzle_width, node.move)
             add_nodes = self.create_child_nodes(node, moves)
             for add_node in add_nodes:
                 self.opened_nodes.append(add_node)

@@ -13,7 +13,9 @@ def get_initial_state_from_file(path):
     linecout = 0
     totallines = 1;
     ret = []
-    with open(path, "r") as f:
+    f = 0
+    try:
+        f = open(path, "r")
         for line in f:
             comment_remover = line.find('#')
             if (comment_remover != -1):
@@ -52,6 +54,9 @@ def get_initial_state_from_file(path):
                 if parsed_puzzle_lines == puzzle_size:
                     break;
             totallines += 1
+    except FileNotFoundError:
+        print("No file found")
+        return None, 0
     if parsed_puzzle_lines < puzzle_size :
         print("Bad puzzle format, missing lines")
         return None, 0
@@ -109,6 +114,12 @@ def check_initial_state(initial_state, size):
     return True
 
 
+def valid_heuristic_arg(arg):
+    for i in g_env.heuristics:
+        if i == arg:
+            return True
+    return False
+
 def main(argc, argv):
     if (argc < 2):
         print("usage : python3 npuzzle.py [puzzle file] [heuristic]")
@@ -119,7 +130,7 @@ def main(argc, argv):
     initial_state, puzzle_size = get_initial_state_from_file(argv[1])
     if argc >= 3:
         g_env.heuristic = argv[2].lower()
-    if argc < 3 or g_env.heuristic in g_env.heuristics == False:
+    if argc < 3 or valid_heuristic_arg(argv[2].lower()) == False:
         print("[WARNING] missing heuristic or wrong heuristic name")
         print("Aviable heuristics : " + str(g_env.heuristics))
         print("Continue ? yes / no (input heuristic name if intend to proceed with one instead)")
