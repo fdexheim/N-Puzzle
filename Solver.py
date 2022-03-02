@@ -10,16 +10,10 @@ from solvability import check_solvability
 class Solver:
     def __init__(self):
         self.opened_nodes = []
-        self.closed_nodes = [] #list of states already gone through
+        self.closed_nodes = { } #dictionary of states already gone through
         time_start = 0
         time_end = 0
         return
-
-
-    def check_closed_nodes(self, node_cmp):
-        if (node_cmp in self.closed_nodes):
-            return True
-        return False
 
 
     def get_chain(self, node):
@@ -27,40 +21,6 @@ class Solver:
         while (tmp != None):
             print(tmp)
             tmp = tmp.parent
-
-
-    def add_closed_node(self, node):
-        self.closed_nodes.append(node)
-        return
-
-
-    def replace_node(self, nodes, node_to_replace, new_node):
-        for i, n in enumerate(nodes):
-            if n == node_to_replace:
-                nodes[i] = new_node
-        return
-
-
-    def create_child_nodes(self, parent, moves):
-        nodes = []
-        for move in moves:
-            new_node = Node(copy.deepcopy(parent.puzzle), parent, move)
-            node_already_exists = False
-            for closed_node in self.closed_nodes:
-                if (new_node.equals(closed_node) == True):
-                    node_already_exists = True
-                    if (new_node.f < closed_node.f):
-                        self.replace_node(self.closed_nodes, closed_node, new_node)
-                    break
-            for opened_node in self.opened_nodes:
-                if (new_node.equals(opened_node) == True):
-                    node_already_exists = True
-                    if (new_node.f < opened_node.f):
-                        self.replace_node(self.opened_nodes, opened_node, new_node)
-                    break
-            if node_already_exists == False:
-                nodes.append(new_node)
-        return nodes
 
 
     def print_solution(self, node):
@@ -81,6 +41,50 @@ class Solver:
         print("Total states      : " + str(g_env.uid))
         print("Time to solve     : " + str(self.time_end - self.time_start))
         exit()
+
+
+    def find_existing_closed_node(self, node_cmp):
+        if (node_cmp.puzzle_hash in self.closed_nodes):
+            return self.closed_nodes[node_cmp.puzzle_hash]
+        return None
+
+
+    def add_closed_node(self, node):
+        existing_node = self.find_existing_closed_node(node)
+        if (existing_node != None and node.f < existing_node.f):
+            self.closed_nodes[node.puzzle_hash] = node
+        elif (existing_node == None):
+            self.closed_nodes[node.puzzle_hash] = node
+        return
+
+
+    def replace_node(self, nodes, node_to_replace, new_node):
+        for i, n in enumerate(nodes):
+            if n == node_to_replace:
+                nodes[i] = new_node
+        return
+
+
+    def create_child_nodes(self, parent, moves):
+        nodes = []
+        for move in moves:
+            new_node = Node(copy.deepcopy(parent.puzzle), parent, move)
+            node_already_exists = False
+            existing_closed_node = self.find_existing_closed_node(new_node)
+            if (existing_closed_node != None):
+                node_already_exists = True
+                if (new_node.f < existing_closed_node.f):
+                    self.closed_nodes[existing_closed_node.puzzle_hash] = new_node
+                break
+            for opened_node in self.opened_nodes:
+                if (new_node.equals(opened_node) == True):
+                    node_already_exists = True
+                    if (new_node.f < opened_node.f):
+                        self.replace_node(self.opened_nodes, opened_node, new_node)
+                    break
+            if node_already_exists == False:
+                nodes.append(new_node)
+        return nodes
 
 
     def astar(self, initial_puzzle):
