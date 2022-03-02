@@ -4,8 +4,11 @@ class g_env:
     uid = 1
     puzzle_width = 0
     desired_board = None
+    desired_board_hash = ""
     time_start = 0
     time_end = 0
     max_opened_states = 0
-    heuristics = { "manhattan_distance", "misplaced_tiles" }
-    heuristic = ""
+    heuristics = { "   d | manhattan_distance", "   m | misplaced_tiles" }
+    heuristic_arg = ""
+    use_heuristic_manhattan_distance = False
+    use_heuristic_misplaced_tiles = False

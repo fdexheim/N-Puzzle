@@ -2,6 +2,7 @@ import sys
 import os
 import array
 import math
+import hashlib
 from tools import tile_yx
 from env import g_env
 from Solver import Solver
@@ -55,10 +56,10 @@ def get_initial_state_from_file(path):
                     break;
             totallines += 1
     except FileNotFoundError:
-        print("No file found")
+        print("[Error] No file found")
         return None, 0
     if parsed_puzzle_lines < puzzle_size :
-        print("Bad puzzle format, missing lines")
+        print("[Error] Bad puzzle format, missing lines")
         return None, 0
     return ret, puzzle_size
 
@@ -114,11 +115,12 @@ def check_initial_state(initial_state, size):
     return True
 
 
-def valid_heuristic_arg(arg):
-    for i in g_env.heuristics:
-        if i == arg:
-            return True
-    return False
+def parse_heuristic_arg(arg):
+    if arg.find('d') != -1:
+        g_env.use_heuristic_manhattan_distance = True
+    if arg.find('m') != -1:
+        g_env.use_heuristic_misplaced_tiles = True
+
 
 def main(argc, argv):
     if (argc < 2):
@@ -128,17 +130,6 @@ def main(argc, argv):
     g_env.argc = argc
     g_env.argv = argv
     initial_state, puzzle_size = get_initial_state_from_file(argv[1])
-    if argc >= 3:
-        g_env.heuristic = argv[2].lower()
-    if argc < 3 or valid_heuristic_arg(argv[2].lower()) == False:
-        print("[WARNING] missing heuristic or wrong heuristic name")
-        print("Aviable heuristics : " + str(g_env.heuristics))
-        print("Continue ? yes / no (input heuristic name if intend to proceed with one instead)")
-        a = input()
-        if (a.lower() == "no" or a.lower() == "n"):
-            return
-        g_env.heuristic = a.lower()
-
     if (initial_state == None):
         print("Parsing Error")
         exit()
@@ -146,7 +137,22 @@ def main(argc, argv):
         print("Puzzle tile verification failed")
         exit()
 
-    print("initial_board " + str(puzzle_size))
+    if argc < 3:
+        print("[Warning] missing heuristic or wrong heuristic name")
+        print("Aviable heuristics : \nflag | heuristic")
+        for heuristic in g_env.heuristics:
+            print(heuristic)
+        print("Continue ? yes / no (input heuristic flag if intend to proceed with one instead)")
+        a = input()
+        if (a.lower() == "no" or a.lower() == "n"):
+            return
+        g_env.heuristic_arg = a.lower()
+    else:
+        g_env.heuristic_arg = argv[2]
+    parse_heuristic_arg(g_env.heuristic_arg)
+
+
+    print("initial_board (size : " + str(puzzle_size) + ") : ")
     for j in range(0, puzzle_size):
         print(initial_state[j])
 
@@ -155,10 +161,11 @@ def main(argc, argv):
         exit()
     g_env.puzzle_width = puzzle_size
     g_env.desired_board = get_desired_board(puzzle_size);
+    g_env.desired_board_hash = hashlib.md5(str(g_env.desired_board).encode('utf-8')).hexdigest()
     print("desired_board : ")
     for j in range(0, puzzle_size):
         print(g_env.desired_board[j])
-    print("puzzle_width : " + str(g_env.puzzle_width))
+    print("")
 
     solver = Solver()
     solver.solve(initial_state)

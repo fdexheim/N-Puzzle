@@ -21,9 +21,9 @@ def misplaced_tiles(current_puzzle):
 
 
 def heuristic(puzzle):
-    if (g_env.heuristic == "misplaced_tiles"):
-        return misplaced_tiles(puzzle)
-    elif (g_env.heuristic == "manhattan_distance"):
-        return manhattan_distance(puzzle)
-    else:
-        return 0
+    ret = 0
+    if (g_env.use_heuristic_misplaced_tiles == True):
+        ret += misplaced_tiles(puzzle)
+    elif (g_env.use_heuristic_manhattan_distance == True):
+        ret += manhattan_distance(puzzle)
+    return ret

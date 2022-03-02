@@ -15,10 +15,12 @@ class Solver:
         time_end = 0
         return
 
+
     def check_closed_nodes(self, node_cmp):
         if (node_cmp in self.closed_nodes):
             return True
         return False
+
 
     def get_chain(self, node):
         tmp = node
@@ -26,13 +28,13 @@ class Solver:
             print(tmp)
             tmp = tmp.parent
 
-    def add_node():
+
+    def add_closed_node(self, node):
+        self.closed_nodes.append(node)
         return
 
 
-
     def replace_node(self, nodes, node_to_replace, new_node):
-
         for i, n in enumerate(nodes):
             if n == node_to_replace:
                 nodes[i] = new_node
@@ -59,7 +61,6 @@ class Solver:
             if node_already_exists == False:
                 nodes.append(new_node)
         return nodes
-
 
 
     def print_solution(self, node):
@@ -92,7 +93,7 @@ class Solver:
             self.opened_nodes.sort(key=lambda x: x.f)
             node = self.opened_nodes.pop(0)
             #node.print_data("first")
-            self.closed_nodes.append(node)
+            self.add_closed_node(node)
             if node.is_solved() == True:
                 return node
             moves = get_possible_moves(node.puzzle, g_env.puzzle_width, node.move)

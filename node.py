@@ -2,6 +2,7 @@ from tools import tile_value_yx
 from tools import tile_yx
 from env import g_env
 from heuristics import heuristic
+import hashlib
 
 class Node:
     def __init__(self, puzzle, parent=None, move=None):
@@ -15,6 +16,7 @@ class Node:
             val = tile_value_yx(puzzle, y0 + move.y, x0 + move.x)
             puzzle[y0][x0] = val
             puzzle[y0 + move.y][x0 + move.x] = 0
+        self.puzzle_hash = hashlib.md5(str(self.puzzle).encode('utf-8')).hexdigest()
         self.g = 0
         if (self.parent != None):
             self.g = parent.g + 1
@@ -23,20 +25,20 @@ class Node:
 
 
     def equals(self, compare):
-        if str(self.puzzle) == str(compare.puzzle):
+        if self.puzzle_hash == compare.puzzle_hash:
             return True
         return False
 
 
 
     def is_solved(self):
-        if (str(self.puzzle) == str(g_env.desired_board)):
+        if self.puzzle_hash == g_env.desired_board_hash:
             return True
         return False
 
 
     def print_data(self, name):
-        print("node {0}   uid = {1}   f = {2}   g = {3}   h = {4}".format(name, self.uid, self.f, self.g, self.h))
+        print("node {0}   uid = {1}   f = {2}   g = {3}   h = {4}   hash = {5}".format(name, self.uid, self.f, self.g, self.h, self.puzzle_hash))
 
     def print_puzzle(self):
         for i in range(0, len(self.puzzle)):
