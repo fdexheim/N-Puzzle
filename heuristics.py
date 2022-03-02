@@ -2,6 +2,11 @@ from tools import tile_yx
 from env import g_env
 
 
+def linear_conflict(current_puzzle):
+    ret = 0
+    return ret
+
+
 def manhattan_distance(current_puzzle):
     ret = 0
     for y in range(0, g_env.puzzle_width):

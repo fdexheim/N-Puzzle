@@ -104,7 +104,6 @@ class Solver:
             add_nodes = self.create_child_nodes(node, moves)
             for add_node in add_nodes:
                 self.opened_nodes.append(add_node)
-            #a = input()
         return None
 
 
