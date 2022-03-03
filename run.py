@@ -3,6 +3,7 @@ import os
 import array
 import math
 import hashlib
+import re
 from tools import tile_yx
 from env import g_env
 from Solver import Solver
@@ -21,6 +22,8 @@ def get_initial_state_from_file(path):
             comment_remover = line.find('#')
             if (comment_remover != -1):
                 line = line[:comment_remover]
+            line = line.lstrip()
+            line = re.sub("\s\s+" , " ", line)
             if (len(line) == 0):
                 continue
             if (firstline == 0):
@@ -120,6 +123,8 @@ def parse_heuristic_arg(arg):
         g_env.use_heuristic_manhattan_distance = True
     if arg.find('m') != -1:
         g_env.use_heuristic_misplaced_tiles = True
+    if arg.find('l') != -1:
+        g_env.use_heuristic_linear_conflict = True
 
 
 def main(argc, argv):

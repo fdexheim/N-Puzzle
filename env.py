@@ -8,7 +8,8 @@ class g_env:
     time_start = 0
     time_end = 0
     max_opened_states = 0
-    heuristics = { "   d | manhattan_distance", "   m | misplaced_tiles" }
+    heuristics = { "   d | manhattan_distance", "   m | misplaced_tiles", "   l | linear_conflict" }
     heuristic_arg = ""
     use_heuristic_manhattan_distance = False
     use_heuristic_misplaced_tiles = False
+    use_heuristic_linear_conflict = False

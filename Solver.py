@@ -24,7 +24,7 @@ class Solver:
 
 
     def print_solution(self, node):
-        self.time_end = time.clock()
+        self.time_end = time.perf_counter()
         nodes = []
         moves = ""
         ptr = node
@@ -117,7 +117,7 @@ class Solver:
         if (g_env.puzzle_width > 5):
             print("You're getting hungry, expect it to take some time (even with heuristics)")
 
-        self.time_start = time.clock()
+        self.time_start = time.perf_counter()
         op = self.astar(initial_puzzle)
 
         if (op != None):
