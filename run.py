@@ -5,6 +5,7 @@ import math
 import hashlib
 import re
 from tools import tile_yx
+from tools import tile_yx_snail
 from env import g_env
 from Solver import Solver
 
@@ -30,7 +31,7 @@ def get_initial_state_from_file(path):
                 try:
                     firstline = 1
                     puzzle_size = int(line)
-                    if (puzzle_size < 2):
+                    if (puzzle_size < 3):
                         print("Bad puzzle_size : " + str(puzzle_size))
                         return None, 0
                 except ValueError:
@@ -71,42 +72,13 @@ def get_desired_board(size):
     ret = [-1] * size
     for i in range(0, size):
         ret[i] = [-1] * size
-    start_x = -1
-    start_y = 0;
-    end_x = size - 1
-    end_y = size - 1
-    x = 0
-    y = 0
-    ymove = 0
-    xmove = 1
 
     ran = int(math.pow(size, 2))
-    for i in range(1, ran + 1):
-        if (i == ran):
-            ret[y][x] = 0
-            return ret
-        else:
-            ret[y][x] = i
-
-        if (x == end_x and y == start_y):
-            xmove = 0
-            ymove = 1
-            start_x += 1
-        elif (x == end_x and y == end_y):
-            xmove = -1
-            ymove = 0
-            start_y += 1
-        elif (x == start_x and y == end_y):
-            xmove = 0
-            ymove = -1
-            end_x -= 1
-        elif (x == start_x and y == start_y):
-            xmove = 1
-            ymove = 0
-            end_y -= 1
-        y += ymove;
-        x += xmove;
-    print("Unexpected return encountered in get_desired_board()")
+    for i in range(0, ran - 1):
+        y, x = tile_yx_snail(i, size)
+        ret[y][x] = i + 1
+    y, x = tile_yx_snail(ran - 1, size)
+    ret[y][x] = 0
     return ret
 
 

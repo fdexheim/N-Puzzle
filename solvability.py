@@ -1,3 +1,6 @@
+from tools import tile_yx_snail, tile_yx
+
+
 def get_inversion_count(puz):
     inversions = 0
     for i in range(0, len(puz)):
@@ -8,17 +11,20 @@ def get_inversion_count(puz):
 
 
 def check_solvability(initial_puzzle, desired_board, puzzle_width):
+#    return True
     one_d_board = []
     one_d_ref = []
-    for i in range(0, puzzle_width):
-        for j in range(0, puzzle_width):
-            one_d_board.append(initial_puzzle[i][j])
-            one_d_ref.append(desired_board[i][j])
-    inversion_board = get_inversion_count(one_d_board)
-    inversion_ref = get_inversion_count(one_d_ref)
+    for i in range(0, puzzle_width * puzzle_width):
+        y, x = tile_yx_snail(i, puzzle_width)
+        one_d_board.append(initial_puzzle[y][x])
+        one_d_ref.append(i + 1)
+    one_d_ref[(puzzle_width * puzzle_width) - 1] = 0
+    inversions = get_inversion_count(one_d_board)
+    inversions_ref = get_inversion_count(one_d_ref)
+    y2, x2 = tile_yx(initial_puzzle, 0)
     if (puzzle_width % 2 == 0):
-        inversion_board += one_d_board.index(0)
-        inversion_ref += one_d_ref.index(0)
-    if (inversion_board % 2 == inversion_ref % 2):
+        inversions += one_d_board.index(0)
+        inversions_ref += one_d_ref.index(0)
+    if (inversions % 2 == inversions_ref % 2):
         return True
     return False
