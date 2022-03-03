@@ -21,7 +21,6 @@ def col_confs(puz):
                     continue
                 if yb < ya:
                     ret += 1
-                    #print("Conflict between " + str(tilea) + " and " + str(tileb))
     return ret
 
 
@@ -44,13 +43,11 @@ def line_confs(puz):
                     continue
                 if xb < xa:
                     ret += 1
-                    #print("Conflict between " + str(tilea) + " and " + str(tileb))
     return ret
 
 
 def linear_conflict(current_puzzle):
     ret = 0
-    #lines
     lc = line_confs(current_puzzle)
     cc = col_confs(current_puzzle)
     man = manhattan_distance(current_puzzle)
@@ -58,9 +55,6 @@ def linear_conflict(current_puzzle):
     ret = lc + cc
     ret *= 2
     ret += man
-#    print("linear_conflict : lc = " + str(lc) + "   cc = " + str(cc) + "   man = " + str(man) +  "   ret = " + str(ret))
-#    for i in range(0, len(current_puzzle)):
-#        print(str(current_puzzle[i]) + "   " + str(g_env.desired_board[i]))
     return ret
 
 

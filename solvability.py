@@ -11,7 +11,6 @@ def get_inversion_count(puz):
 
 
 def check_solvability(initial_puzzle, desired_board, puzzle_width):
-#    return True
     one_d_board = []
     one_d_ref = []
     for i in range(0, puzzle_width * puzzle_width):

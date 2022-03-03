@@ -96,7 +96,6 @@ class Solver:
                 g_env.max_opened_states = op_size
             self.opened_nodes.sort(key=lambda x: x.f)
             node = self.opened_nodes.pop(0)
-            #node.print_data("first")
             self.add_closed_node(node)
             if node.is_solved() == True:
                 return node
