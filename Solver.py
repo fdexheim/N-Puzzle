@@ -74,8 +74,8 @@ class Solver:
             if (existing_closed_node != None):
                 node_already_exists = True
                 if (new_node.f < existing_closed_node.f):
-                    self.closed_nodes[existing_closed_node.puzzle_hash] = new_node
-                break
+                    del self.closed_nodes[existing_closed_node.puzzle_hash]
+                    node_already_exists = False
             for opened_node in self.opened_nodes:
                 if (new_node.equals(opened_node) == True):
                     node_already_exists = True
