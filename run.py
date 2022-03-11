@@ -65,6 +65,9 @@ def get_initial_state_from_file(path):
     if parsed_puzzle_lines < puzzle_size :
         print("[Error] Bad puzzle format, missing lines")
         return None, 0
+    if parsed_puzzle_lines < 3 :
+        print("[Error] Bad puzzle file")
+        return None, 0
     return ret, puzzle_size
 
 
@@ -108,10 +111,10 @@ def main(argc, argv):
     g_env.argv = argv
     initial_state, puzzle_size = get_initial_state_from_file(argv[1])
     if (initial_state == None):
-        print("Parsing Error")
+        print("[Error] Parsing Error")
         exit()
     if (check_initial_state(initial_state, puzzle_size) == False):
-        print("Puzzle tile verification failed")
+        print("[Error] Puzzle tile verification failed")
         exit()
 
     if argc < 3:
@@ -134,7 +137,7 @@ def main(argc, argv):
         print(initial_state[j])
 
     if (check_initial_state(initial_state, puzzle_size) == False):
-        print("Bad initial_state")
+        print("[Error] Bad initial_state")
         exit()
     g_env.puzzle_width = puzzle_size
     g_env.desired_board = get_desired_board(puzzle_size);
